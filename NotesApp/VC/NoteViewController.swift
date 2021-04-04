@@ -11,11 +11,13 @@ class NoteViewController: UIViewController {
     
     @IBOutlet weak var noteTitleLabel: UITextField!
     @IBOutlet weak var noteBodyTextView: UITextView!
+    
     weak var notesViewController: ViewController!
     var note: Note!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.setNavigationBarHidden(false, animated: true)
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(saveNote))
 
@@ -64,6 +66,7 @@ class NoteViewController: UIViewController {
         if note == nil {
             note = Note(context: managedContext)
             notesViewController.notes.insert(note, at: 0)
+            notesViewController.searchNotes.insert(note, at: 0)
         }
         
         note.title = title

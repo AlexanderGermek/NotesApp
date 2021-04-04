@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8884D8EE2618DDDD00B11E3C /* PlusButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8884D8ED2618DDDD00B11E3C /* PlusButton.swift */; };
 		88DBF9F62603835E0084CEAC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88DBF9F52603835E0084CEAC /* AppDelegate.swift */; };
 		88DBF9F82603835E0084CEAC /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88DBF9F72603835E0084CEAC /* SceneDelegate.swift */; };
 		88DBF9FA2603835E0084CEAC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88DBF9F92603835E0084CEAC /* ViewController.swift */; };
@@ -22,6 +23,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8884D8ED2618DDDD00B11E3C /* PlusButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlusButton.swift; sourceTree = "<group>"; };
 		88DBF9F22603835E0084CEAC /* NotesApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NotesApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		88DBF9F52603835E0084CEAC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		88DBF9F72603835E0084CEAC /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -73,7 +75,6 @@
 				88DBFB162603D3EB0084CEAC /* VC */,
 				88DBFB0C2603D11C0084CEAC /* Model */,
 				88DBFB142603D34A0084CEAC /* CoreData */,
-				88DBF9FB2603835E0084CEAC /* Main.storyboard */,
 				88DBF9FE2603835F0084CEAC /* Assets.xcassets */,
 				88DBFA002603835F0084CEAC /* LaunchScreen.storyboard */,
 				88DBFA032603835F0084CEAC /* Info.plist */,
@@ -84,9 +85,11 @@
 		88DBFB0C2603D11C0084CEAC /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				8884D8ED2618DDDD00B11E3C /* PlusButton.swift */,
 				88DBFA0D260385A90084CEAC /* NoteCell.swift */,
 				88DBFAFD2603C7680084CEAC /* Note+CoreDataClass.swift */,
 				88DBFAFE2603C7680084CEAC /* Note+CoreDataProperties.swift */,
+				88DBF9FB2603835E0084CEAC /* Main.storyboard */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -182,6 +185,7 @@
 				88DBF9FA2603835E0084CEAC /* ViewController.swift in Sources */,
 				88DBF9F62603835E0084CEAC /* AppDelegate.swift in Sources */,
 				88DBFAF82603C65E0084CEAC /* NoteModel.xcdatamodeld in Sources */,
+				8884D8EE2618DDDD00B11E3C /* PlusButton.swift in Sources */,
 				88DBFA0E260385A90084CEAC /* NoteCell.swift in Sources */,
 				88DBF9F82603835E0084CEAC /* SceneDelegate.swift in Sources */,
 				88DBFAFF2603C7680084CEAC /* Note+CoreDataClass.swift in Sources */,

@@ -7,7 +7,6 @@
 
 import CoreData
 
-
 //MARK: CoreDataFunctions ---------------------------------------------------------------------------------
 //1. Save
 func saveNotes(notes: [Note]) {
