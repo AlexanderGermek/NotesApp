@@ -12,6 +12,7 @@ class NoteCell: UICollectionViewCell {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var bodyLabel: UILabel!
     @IBOutlet weak var dateLabel: UILabel!
+    @IBOutlet weak var reminderButton: UIButton!
     
     func setupNoteCell() {
         //Apply rounded corners
@@ -35,6 +36,11 @@ class NoteCell: UICollectionViewCell {
         
         bodyLabel.lineBreakMode = .byWordWrapping // notice the 'b' instead of 'B'
         bodyLabel.numberOfLines = 0
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        self.reminderButton.isHidden = true
     }
 
 

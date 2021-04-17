@@ -13,15 +13,23 @@ class ViewController: UIViewController, UICollectionViewDataSource & UICollectio
     var detailViewController: NoteViewController!
     var notes: [Note]!
     var searchNotes: [Note]!
+    
+    private var dimmedView: UIView = {
+        let view = UIView()
+        view.isHidden = true
+        view.alpha = 0.4
+        view.backgroundColor = .black
+        return view
+    }()
 
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var searchBar: UISearchBar!
     
+    //MARK: - Override -----------------------------------------------------------------
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        searchBar.autocapitalizationType = .none
-        
+        //load notes and create first note
         notes = loadNotes()
         
         let def = UserDefaults.standard
@@ -30,30 +38,42 @@ class ViewController: UIViewController, UICollectionViewDataSource & UICollectio
         if !first { createFirstNote() }
         
         searchNotes = notes
-
-    
-        let button = plusButton(frame: CGRect(x: view.frame.width - 70, y: view.frame.height - 70, width: 50, height: 50))
                 
-        button.addTarget(self, action: #selector(plusButton_AddNewNote), for: .touchUpInside)
-        view.addSubview(button)
-                
+        //search bar:
+        searchBar.autocapitalizationType = .none
         searchBar.setImage(UIImage(), for: .clear, state: .normal)
         
+        // button to add new notes:
+        let button = plusButton(frame: CGRect(x: view.frame.width - 70, y: view.frame.height - 70, width: 50, height: 50))
+        button.addTarget(self, action: #selector(plusButton_AddNewNote), for: .touchUpInside)
+        view.addSubview(button)
+        
+        // dimmed view:
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(didTapDimmedView))
+        gesture.numberOfTouchesRequired = 1
+        gesture.numberOfTapsRequired = 1
+        dimmedView.addGestureRecognizer(gesture)
+        view.addSubview(dimmedView)
     }
     
-    //MARK: Actions -------------------------------------------------------------------------------------------------------------------
-    //Добавить новую заметку
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        dimmedView.frame = collectionView.frame
+    }
+    
+    
+    //MARK: - Actions ------------------------------------------------------------------
+    //Add new note:
     @objc func plusButton_AddNewNote() {
         
         if let vc = storyboard?.instantiateViewController(identifier: "NoteVC") as? NoteViewController {
-            
             vc.notesViewController = self
             self.detailViewController = vc
             navigationController?.pushViewController(vc, animated: true)
         }
     }
     
-    //Удалить заметку
+    //Delete note:
     @IBAction func deleteNote(_ sender: UIButton) {
         
         guard let noteCell = getNoteCellFrom(deleteButton: sender) as? NoteCell else { return }
@@ -61,8 +81,8 @@ class ViewController: UIViewController, UICollectionViewDataSource & UICollectio
         if let indexPath = collectionView.indexPath(for: noteCell) {
         
             let note = searchNotes[indexPath.item]
+            
             managedContext.delete(note)
-
             searchNotes.remove(at: indexPath.item)
             
             if let index = notes.firstIndex(of: note) {
@@ -72,12 +92,11 @@ class ViewController: UIViewController, UICollectionViewDataSource & UICollectio
             collectionView.reloadData()
             saveNotes(notes: notes)
         }
-        
     }
-    //Получить ячейку для удаления
+    //Get cell when delete note button tapped:
     func getNoteCellFrom(deleteButton: UIView) -> UICollectionViewCell? {
         
-        if  deleteButton.superview == nil{
+        if  deleteButton.superview == nil {
             return nil
         }
         
@@ -91,9 +110,14 @@ class ViewController: UIViewController, UICollectionViewDataSource & UICollectio
         
     }
     
+    //Hide dimmed view when tapped
+    @objc func didTapDimmedView() {
+        searchBarCancelButtonClicked(searchBar)
+    }
     
-    //MARK: Functions -----------------------------------------------------------------------------------------------------------------
-    //Строку с датой из даты
+    
+    //MARK: - Functions ------------------------------------------------------------------
+    //Get String from Date:
     func getDateStringFrom(date: Date)  -> String {
         
         let dayTimePeriodFormatter = DateFormatter()
@@ -103,7 +127,7 @@ class ViewController: UIViewController, UICollectionViewDataSource & UICollectio
         return dayTimePeriodFormatter.string(from: date)
     }
     
-    //Создание первой заметки при первом запуске пользователем
+    //Create first Test note if app launch first time:
     func createFirstNote() {
         
         let note = Note(context: managedContext)
@@ -117,7 +141,7 @@ class ViewController: UIViewController, UICollectionViewDataSource & UICollectio
         collectionView.reloadData()
     }
     
-    //Открыть контроллер для создания новой заметки
+    //Open NoteViewController for creation new note:
     @objc func createNewNote() {
         
         if let vc = storyboard?.instantiateViewController(identifier: "NoteVC") as? NoteViewController {
@@ -128,7 +152,7 @@ class ViewController: UIViewController, UICollectionViewDataSource & UICollectio
         }
     }
     
-    //Открыть заметку для правки
+    //Open note for edit:
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
         if let vc = segue.destination as? NoteViewController {
@@ -145,7 +169,93 @@ class ViewController: UIViewController, UICollectionViewDataSource & UICollectio
         }
     }
     
-    //Установка фильтра по ячейкам
+    
+    //MARK: - UICollectionViewDataSource ----------------------------------------------------
+     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return searchNotes.count
+    }
+    
+     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+       let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NoteCell", for: indexPath) as! NoteCell
+        
+        let note = searchNotes[indexPath.item]
+        
+        cell.setupNoteCell()
+    
+        
+        cell.titleLabel.text = note.title
+        cell.bodyLabel.text  = note.body
+        cell.dateLabel.text  = getDateStringFrom(date: note.date!)
+        
+        if note.reminderDate != nil {
+            let currentDate = Date()
+            
+            if currentDate > note.reminderDate! {
+                note.reminderDate = nil
+            } else {
+                cell.reminderButton.isHidden = false
+            }
+        }
+        
+        return cell
+    }
+    
+    
+    //MARK: - UISearchBarDelegate ------------------------------------------------------------
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        
+        dimmedView.isHidden = false
+        
+        UIView.animate(withDuration: 0.2) {
+            searchBar.setShowsCancelButton(true, animated: true)
+            self.navigationController?.setNavigationBarHidden(true, animated: true)
+            self.dimmedView.alpha = 0.4
+        }
+    }
+
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        
+        UIView.animate(withDuration: 0.2) {
+            self.dimmedView.alpha = 0
+            searchBar.setShowsCancelButton(false, animated: true)
+            searchBar.resignFirstResponder()
+
+            self.navigationController?.setNavigationBarHidden(false, animated: true)
+            self.navigationController?.hidesBarsOnTap = false
+            
+        } completion: { isDone in
+            
+            if isDone {
+                self.dimmedView.isHidden = true
+                searchBar.text = ""
+                self.searchNotesWithText(text: searchBar.text!)
+            }
+        }
+        
+
+
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        searchNotesWithText(text: searchText)
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        searchBar.setShowsCancelButton(false, animated: true)
+        searchBar.resignFirstResponder()
+        
+        
+        UIView.animate(withDuration: 0.2) {
+            self.dimmedView.alpha = 0
+        } completion: { (isDone) in
+            
+            if isDone { self.dimmedView.isHidden = true}
+        }
+    }
+    
+    //Search:
     func searchNotesWithText(text: String) {
         
         if text == "" {
@@ -155,52 +265,6 @@ class ViewController: UIViewController, UICollectionViewDataSource & UICollectio
         }
         
         collectionView.reloadData()
-    }
-    
-    
-    //MARK: UICollectionViewDataSource ------------------------------------------------------------------------------------------------
-     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return searchNotes.count
-    }
-    
-     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "NoteCell", for: indexPath) as? NoteCell else {
-            fatalError("Unable to dequeue NoteCell!")
-        }
-        
-        let note = searchNotes[indexPath.item]
-        
-        cell.setupNoteCell()
-        
-        cell.titleLabel.text = note.title
-        cell.bodyLabel.text  = note.body
-        cell.dateLabel.text  = getDateStringFrom(date: note.date!)
-        
-        return cell
-    }
-    
-    //MARK: UISearchBarDelegate
-    //1. Настройка показа кнопки Cancel:
-    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-        
-        searchBar.setShowsCancelButton(true, animated: true)
-        navigationController?.setNavigationBarHidden(true, animated: true)
-        //navigationController?.hidesBarsOnTap = true
-    }
-    //2.
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        
-        searchBar.setShowsCancelButton(false, animated: true)
-        searchBar.resignFirstResponder()
-        searchBar.text = ""
-        searchNotesWithText(text: searchBar.text!)
-        navigationController?.setNavigationBarHidden(false, animated: true)
-        navigationController?.hidesBarsOnTap = false
-    }
-    
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        searchNotesWithText(text: searchText)
     }
 }
 
