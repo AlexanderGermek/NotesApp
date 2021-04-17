@@ -1,3 +1,3 @@
 # NotesApp
 
-![ezgif com-video-to-gif](https://user-images.githubusercontent.com/76963888/113521175-6cf16f00-95a0-11eb-96e1-a07063c352f9.gif)
+![MainGif](https://user-images.githubusercontent.com/76963888/115115607-0a37a480-9f9e-11eb-9393-dc8804803e9b.gif)
